@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ ! -d ${HOME}/bin ];then
+mkdir ${HOME}/bin;
+fi
+
+if [ ! -d ${HOME}/bin/machine.list ];then
+touch ${HOME}/bin/machine.list
+fi
+
+#create the id_rsa.pub if it does not exist.
+
+if [ ! -f ${HOME}/.ssh/id_rsa.pub ];then
+ssh-keygen -t rsa
+else
+echo "id_rsa.pub already exist, just do next step to add the authoirized_keys to these ips from machine.list"
+fi
+
+
+exit
+
+
+AUTHORIZED_KEYS=`cat ${HOME}/.ssh/id_rsa.pub`
+
+for i in $(cat ${HOME}/bin/machine.list);do
+ssh $i "cd ${HOME} && test -d .ssh || mkdir .ssh && cd .ssh && echo ${AUTHORIZED_KEYS} >> authorized_keys && chmod 600 authorized_keys "
+done
